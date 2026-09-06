@@ -20,11 +20,11 @@ export function Footer() {
               </div>
               <div className="flex flex-col text-left">
                 <span className="serif text-xl tracking-[0.2em] font-normal text-white">ALYORA</span>
-                <span className="text-[8px] uppercase tracking-[0.2em] text-[#9ab4be]">Where Life Finds Its Place.</span>
+                <span className="text-[8px] uppercase tracking-[0.2em] text-[#b8ced6]">Where Life Finds Its Place.</span>
               </div>
             </Link>
 
-            <p className="text-xs text-[#9ab4be] leading-relaxed hidden md:block">
+            <p className="text-xs text-[#b8ced6] leading-relaxed hidden md:block">
               {COMPANY_CONFIG.name} is your trusted real-estate partner in Kerala, connecting people with better homes, smarter investments, and transparent documentation.
             </p>
 
@@ -47,13 +47,15 @@ export function Footer() {
           {/* QUICK LINKS */}
           <div className="hidden md:block">
             <h4 className="text-white font-semibold text-sm uppercase tracking-wider mb-4 border-b border-white/10 pb-2">Navigation</h4>
-            <ul className="space-y-2.5 text-xs text-[#9ab4be]">
-              <li><Link href="/" className="hover:text-white transition">Home</Link></li>
-              <li><Link href="/properties" className="hover:text-white transition">Property Catalog</Link></li>
-              <li><Link href="/properties?filter=featured" className="hover:text-white transition">Featured Listing</Link></li>
-              <li><Link href="/#contact" className="hover:text-white transition">Contact Us</Link></li>
-              <li><Link href="/admin/login" className="hover:text-[#cbbf9d] transition">Admin Portal</Link></li>
-            </ul>
+            <nav aria-label="Footer Navigation">
+              <ul className="space-y-2.5 text-xs text-[#b8ced6]">
+                <li><Link href="/" className="hover:text-white transition">Home</Link></li>
+                <li><Link href="/properties" className="hover:text-white transition">Property Catalog</Link></li>
+                <li><Link href="/properties?filter=featured" className="hover:text-white transition">Featured Listing</Link></li>
+                <li><Link href="/#contact" className="hover:text-white transition">Contact Us</Link></li>
+                <li><Link href="/admin/login" className="hover:text-[#cbbf9d] transition">Admin Portal</Link></li>
+              </ul>
+            </nav>
           </div>
 
           {/* FEATURED PROPERTY */}
@@ -72,7 +74,7 @@ export function Footer() {
                 <div className="absolute top-1.5 right-1.5 bg-[#cbbf9d] text-[#102f3f] text-[9px] font-bold px-1.5 py-0.5 rounded-sm">FOR SALE</div>
               </div>
               <p className="text-[13px] text-white font-medium group-hover:text-[#cbbf9d] transition-colors line-clamp-1">Serene Lakeview Villa</p>
-              <div className="flex items-center gap-1.5 mt-1 text-[11px] text-[#9ab4be]">
+              <div className="flex items-center gap-1.5 mt-1 text-[11px] text-[#b8ced6]">
                 <span>Kochi, Kerala</span>
                 <span className="w-1 h-1 rounded-full bg-white/20"></span>
                 <span className="font-semibold text-white">₹ 1.5 Cr</span>
@@ -83,7 +85,7 @@ export function Footer() {
           {/* CONTACT INFO */}
           <div className="hidden md:block">
             <h4 className="text-white font-semibold text-sm uppercase tracking-wider mb-4 border-b border-white/10 pb-2">Get in Touch</h4>
-            <div className="space-y-3 text-xs text-[#9ab4be]">
+            <div className="space-y-3 text-xs text-[#b8ced6]">
               <div className="flex items-start gap-3">
                 <Phone className="w-4 h-4 text-[#cbbf9d] shrink-0 mt-0.5" />
                 <span>{COMPANY_CONFIG.phone}</span>
@@ -101,9 +103,9 @@ export function Footer() {
         </div>
 
         {/* COPYRIGHT */}
-        <div className="pt-6 md:pt-8 text-center text-xs text-[#7a96a3] flex flex-col sm:flex-row items-center justify-between gap-2 md:gap-3">
+        <div className="pt-6 md:pt-8 text-center text-xs text-[#a5c1cd] flex flex-col sm:flex-row items-center justify-between gap-2 md:gap-3">
           <div>© {new Date().getFullYear()} {COMPANY_CONFIG.name}. All rights reserved.</div>
-          <div className="text-[10px] md:text-[11px] text-[#9ab4be]">Where Life Finds Its Place.</div>
+          <div className="text-[10px] md:text-[11px] text-[#b8ced6]">Where Life Finds Its Place.</div>
         </div>
       </div>
     </footer>

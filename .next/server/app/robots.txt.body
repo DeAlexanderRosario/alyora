@@ -1,0 +1,7 @@
+User-Agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /shared/
+
+Sitemap: https://homes.alyora.in/sitemap.xml

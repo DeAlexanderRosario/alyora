@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
         rules: {
             userAgent: '*',
             allow: '/',
-            disallow: ['/admin/', '/api/'],
+            disallow: ['/admin/', '/api/', '/shared/'],
         },
         sitemap: 'https://homes.alyora.in/sitemap.xml',
     };
