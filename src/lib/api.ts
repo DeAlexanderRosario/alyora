@@ -277,6 +277,10 @@ export const api = {
     return del(`/api/shared?id=${id}`);
   },
 
+  async getAuditLogs() {
+    return get<any[]>('/api/audit-logs', true);
+  },
+
   async uploadImage(file: File): Promise<MediaAsset> {
     const formData = new FormData();
     formData.append('image', file);
