@@ -67,20 +67,10 @@ export async function GET(req: NextRequest, { params }: { params: { token: strin
       notes: `Share link viewed (Total views: ${shareLink.viewsCount})`,
     });
 
-    // Filter Property Data based on shareLink permissions
-    console.log('[SharedAPI] ShareLink permissions:', JSON.stringify(shareLink.permissions, null, 2));
-    console.log('[SharedAPI] Raw property media count:', property.media?.length ?? 0);
-    console.log('[SharedAPI] Raw property docs count:', property.documents?.length ?? 0);
-
     // Serialize to plain object so strict:false fields (showOwnerDetails etc.) are all included
     const shareLinkObj = shareLink.toObject ? shareLink.toObject({ virtuals: false }) : shareLink;
 
     const filteredProperty = filterSharedProperty(property, shareLinkObj as any);
-
-    console.log('[SharedAPI] Filtered property name:', filteredProperty.name);
-    console.log('[SharedAPI] Filtered media count:', filteredProperty.media?.length ?? 0);
-    console.log('[SharedAPI] Filtered price:', filteredProperty.price);
-    console.log('[SharedAPI] showOwnerDetails permission:', shareLinkObj.permissions?.showOwnerDetails);
 
     return NextResponse.json({
       success: true,

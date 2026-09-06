@@ -216,7 +216,6 @@ export default function SharedPropertyPage() {
 
       setRequiresPasscode(false);
       setProperty(data.property);
-      console.log('[SharedPage] API response:', JSON.stringify(data, null, 2));
 
       setLeadName(data.leadName || "");
       setSalespersonId(data.salespersonId || "");
