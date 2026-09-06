@@ -61,7 +61,14 @@ export function Footer() {
             <h4 className="text-white font-semibold text-sm uppercase tracking-wider mb-4 border-b border-white/10 pb-2">Featured Property</h4>
             <Link href="/properties" className="group block">
               <div className="relative overflow-hidden rounded bg-white/5 mb-2.5">
-                <img src="https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=300" alt="Sample Property" className="w-full h-20 object-cover transition duration-500 group-hover:scale-110" />
+                <img
+                  src="https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=300"
+                  alt="Serene Lakeview Villa in Kochi Kerala - ALYORA Featured Real Estate Property"
+                  width={300}
+                  height={80}
+                  loading="lazy"
+                  className="w-full h-20 object-cover transition duration-500 group-hover:scale-110"
+                />
                 <div className="absolute top-1.5 right-1.5 bg-[#cbbf9d] text-[#102f3f] text-[9px] font-bold px-1.5 py-0.5 rounded-sm">FOR SALE</div>
               </div>
               <p className="text-[13px] text-white font-medium group-hover:text-[#cbbf9d] transition-colors line-clamp-1">Serene Lakeview Villa</p>

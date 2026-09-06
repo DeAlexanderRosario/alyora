@@ -155,10 +155,8 @@ export default function HomePage() {
 
         {/* Hero Content */}
         <div className="hero-content" style={{ marginTop: 60, marginBottom: 120 }}>
-          <h1 className="serif" style={{ color: '#ffffff', fontSize: '3.2rem', lineHeight: 1.1, fontWeight: 400, maxWidth: 500 }}>
-            More Than<br />
-            Properties.<br />
-            A Better Tomorrow.
+          <h1 className="serif" style={{ color: '#ffffff', fontSize: '3.2rem', lineHeight: 1.1, fontWeight: 400, maxWidth: 550 }}>
+            More Than Properties.<br className="hidden sm:inline" /> A Better Tomorrow.
           </h1>
           <p style={{ color: '#ffffff', fontSize: 16, marginTop: 16, lineHeight: 1.5, opacity: 0.9 }}>
             Homes. Investments. Opportunities.<br />
@@ -564,6 +562,76 @@ export default function HomePage() {
           </div>
         )
       }
+
+      {/* FAQ & Real Estate Knowledge Section (SEO Article) */}
+      <section style={{ backgroundColor: '#f0f4f5', padding: '60px 5%', borderTop: '1px solid #e8edee' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 40 }}>
+          {/* SEO Rich Text Overview */}
+          <article style={{ backgroundColor: '#ffffff', borderRadius: 16, padding: '32px 40px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)' }}>
+            <span style={{ color: '#66777a', fontSize: 11, fontWeight: 700, letterSpacing: 2 }}>REAL ESTATE IN KERALA</span>
+            <h2 className="serif" style={{ color: '#153545', fontSize: 28, marginTop: 8, marginBottom: 16 }}>
+              Your Trusted Partner for Homes, Investments, and Land Verification
+            </h2>
+            <div style={{ color: '#526268', fontSize: 14, lineHeight: 1.8, display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <p>
+                ALYORA is Kerala&apos;s leading real estate platform, dedicated to connecting buyers, sellers, and investors with premium properties across prime locations including Kochi, Kottayam, Trivandrum, Thrissur, and Kozhikode. Whether you are searching for modern luxury villas, waterfront residential plots, high-yield commercial spaces, or serene countryside homes, ALYORA provides verified listings backed by transparent property documentation.
+              </p>
+              <p>
+                Navigating property transactions in Kerala requires absolute clarity on land titles, encumbrance certificates, building permits, and zoning regulations. Our team of local real estate specialists ensures every property listed on ALYORA undergoes rigorous legal document verification before reaching our catalog. We provide end-to-end support—from initial search and virtual tours to price negotiations, legal consultation, and final registration.
+              </p>
+              <p>
+                For NRIs (Non-Resident Indians) looking to invest back home in Kerala, ALYORA delivers seamless property management, remote site inspection updates, and trusted advisory services. Explore our curated portfolio today to find a property where your life finds its true place.
+              </p>
+            </div>
+          </article>
+
+          {/* Frequently Asked Questions */}
+          <div style={{ backgroundColor: '#ffffff', borderRadius: 16, padding: '32px 40px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)' }}>
+            <span style={{ color: '#66777a', fontSize: 11, fontWeight: 700, letterSpacing: 2 }}>FREQUENTLY ASKED QUESTIONS</span>
+            <h2 className="serif" style={{ color: '#153545', fontSize: 28, marginTop: 8, marginBottom: 24 }}>
+              Everything You Need to Know About Buying Property with ALYORA
+            </h2>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+              <div style={{ backgroundColor: '#f7f9f9', padding: 20, borderRadius: 12, border: '1px solid #e8edee' }}>
+                <h3 style={{ color: '#153545', fontSize: 16, fontWeight: 600, marginBottom: 8 }}>
+                  How does ALYORA verify property listings?
+                </h3>
+                <p style={{ color: '#657176', fontSize: 13, lineHeight: 1.6 }}>
+                  Every listing on ALYORA is audited by legal experts. We verify title deeds, encumbrance certificates (EC), land tax receipts, and municipal approval plans to protect buyers against encumbrances or title disputes.
+                </p>
+              </div>
+
+              <div style={{ backgroundColor: '#f7f9f9', padding: 20, borderRadius: 12, border: '1px solid #e8edee' }}>
+                <h3 style={{ color: '#153545', fontSize: 16, fontWeight: 600, marginBottom: 8 }}>
+                  Can NRIs buy property in Kerala through ALYORA?
+                </h3>
+                <p style={{ color: '#657176', fontSize: 13, lineHeight: 1.6 }}>
+                  Yes, NRIs can legally acquire residential and commercial properties in Kerala. ALYORA offers specialized NRI assistance including legal documentation, Power of Attorney guidance, and remote site video inspections.
+                </p>
+              </div>
+
+              <div style={{ backgroundColor: '#f7f9f9', padding: 20, borderRadius: 12, border: '1px solid #e8edee' }}>
+                <h3 style={{ color: '#153545', fontSize: 16, fontWeight: 600, marginBottom: 8 }}>
+                  Which locations in Kerala have the highest property ROI?
+                </h3>
+                <p style={{ color: '#657176', fontSize: 13, lineHeight: 1.6 }}>
+                  Kochi (Edappally, Kakkanad, Marine Drive), Trivandrum (Technopark corridor), and growing hubs like Kottayam and Thrissur offer high capital appreciation and rental yield for residential villas and commercial plots.
+                </p>
+              </div>
+
+              <div style={{ backgroundColor: '#f7f9f9', padding: 20, borderRadius: 12, border: '1px solid #e8edee' }}>
+                <h3 style={{ color: '#153545', fontSize: 16, fontWeight: 600, marginBottom: 8 }}>
+                  What documents are required to buy a house or plot in Kerala?
+                </h3>
+                <p style={{ color: '#657176', fontSize: 13, lineHeight: 1.6 }}>
+                  Essential documents include the Title Deed (Sale Deed), Possession Certificate, Encumbrance Certificate (minimum 15-30 years), Land Revenue Tax Receipt, and Building Location Sketch.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <Footer />
     </div >
