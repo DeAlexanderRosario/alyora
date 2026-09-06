@@ -184,8 +184,32 @@ export default function PropertyPage() {
 
   const coverUrl = photos[0]?.secure_url || property.image_url || '/placeholder.jpg';
 
+  const propertySchema = {
+    '@context': 'https://schema.org',
+    '@type': 'RealEstateListing',
+    name: title,
+    description: about,
+    url: `https://homes.alyora.in/properties/${id}`,
+    image: coverUrl,
+    offeredBy: {
+      '@type': 'RealEstateAgent',
+      name: 'ALYORA Real Estate',
+      url: 'https://homes.alyora.in',
+    },
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: locality,
+      addressRegion: 'Kerala',
+      addressCountry: 'IN',
+    },
+  };
+
   return (
     <div className="min-h-screen bg-white text-[#153545] flex flex-col font-sans selection:bg-[#cbbf9d]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(propertySchema) }}
+      />
       <Header />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 pb-20 lg:pb-6 space-y-8">
@@ -208,7 +232,7 @@ export default function PropertyPage() {
         <section className="relative w-full h-[40vh] sm:h-[48vh] min-h-[280px] max-h-[480px] rounded-3xl overflow-hidden shadow-xl border border-[#e8edee] group">
           <img
             src={coverUrl}
-            alt={title}
+            alt={`${title} - ${type} for sale in ${locality}, Kerala`}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#153545]/90 via-[#153545]/30 to-transparent" />

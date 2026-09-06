@@ -159,7 +159,8 @@ export default function PropertiesListingPage() {
                   <div className="relative height-[220px] h-52 overflow-hidden bg-[#103143]">
                     <img
                       src={displayImg}
-                      alt={p.name}
+                      alt={`${p.name || 'Property'} - ${p.propertyType || 'Real Estate'} for sale in ${p.location || 'Kerala'}`}
+                      loading="lazy"
                       className="w-full h-full object-cover transition duration-700 group-hover:scale-105"
                     />
 
