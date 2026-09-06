@@ -1,0 +1,11 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/admin/properties/page": "app/admin/properties/page.js",
+  "/api/properties/route": "app/api/properties/route.js",
+  "/shared/property/[token]/page": "app/shared/property/[token]/page.js",
+  "/properties/[id]/page": "app/properties/[id]/page.js",
+  "/page": "app/page.js",
+  "/api/locations/route": "app/api/locations/route.js",
+  "/properties/page": "app/properties/page.js",
+  "/api/auth/me/route": "app/api/auth/me/route.js"
+}
