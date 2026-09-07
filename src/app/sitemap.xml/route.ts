@@ -6,16 +6,14 @@ import { generatePropertySlug } from '@/lib/slug';
 export const revalidate = 3600; // Cache for 1 hour
 
 function escapeXml(unsafe: string): string {
-    return unsafe.replace(/[<>&'"]/g, (c) => {
-        switch (c) {
-            case '<': return '&lt;';
-            case '>': return '&gt;';
-            case '&': return '&amp;';
-            case '\'': return '&apos;';
-            case '"': return '&quot;';
-            default: return c;
-        }
-    });
+    if (!unsafe) return '';
+    return unsafe
+        .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '') // Strip XML invalid control chars
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
 }
 
 export async function GET() {
@@ -39,7 +37,7 @@ export async function GET() {
     xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n`;
     xml += `        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n`;
 
-    // Static core pages
+    // 1. Static Core Canonical Pages
     const staticPages = [
         { url: `${baseUrl}`, priority: '1.0', changefreq: 'daily' },
         { url: `${baseUrl}/properties`, priority: '0.9', changefreq: 'daily' },
@@ -54,30 +52,7 @@ export async function GET() {
         xml += `  </url>\n`;
     });
 
-    // Property categories
-    const categories = ['Villa', 'House', 'Apartment', 'Land', 'Commercial'];
-    categories.forEach((cat) => {
-        const catUrl = `${baseUrl}/properties?type=${encodeURIComponent(cat)}`;
-        xml += `  <url>\n`;
-        xml += `    <loc>${escapeXml(catUrl)}</loc>\n`;
-        xml += `    <lastmod>${now}</lastmod>\n`;
-        xml += `    <changefreq>weekly</changefreq>\n`;
-        xml += `    <priority>0.8</priority>\n`;
-        xml += `  </url>\n`;
-    });
-
-    // Locations
-    (locations || []).forEach((loc) => {
-        const locUrl = `${baseUrl}/properties?location=${encodeURIComponent(loc.name)}`;
-        xml += `  <url>\n`;
-        xml += `    <loc>${escapeXml(locUrl)}</loc>\n`;
-        xml += `    <lastmod>${now}</lastmod>\n`;
-        xml += `    <changefreq>weekly</changefreq>\n`;
-        xml += `    <priority>0.7</priority>\n`;
-        xml += `  </url>\n`;
-    });
-
-    // Property Detail Pages & Google Images
+    // 2. Property Detail Pages & Image Sitemaps
     (properties || []).forEach((p) => {
         const id = (p._id || p.id || '').toString();
         const slug = generatePropertySlug(p.name || 'property', p.location || 'kerala', id);
@@ -102,10 +77,11 @@ export async function GET() {
 
         if (Array.isArray(p.media)) {
             p.media.forEach((m: any, idx: number) => {
-                if (m.secure_url && typeof m.secure_url === 'string' && m.secure_url.startsWith('http')) {
-                    if (!publicImages.some((img) => img.url === m.secure_url)) {
+                const mediaUrl = m.secure_url || m.url;
+                if (mediaUrl && typeof mediaUrl === 'string' && mediaUrl.startsWith('http')) {
+                    if (!publicImages.some((img) => img.url === mediaUrl)) {
                         publicImages.push({
-                            url: m.secure_url,
+                            url: mediaUrl,
                             title: generatePropertyImageAlt(p, m.caption, idx + 1),
                         });
                     }
@@ -128,8 +104,9 @@ export async function GET() {
     return new NextResponse(xml, {
         status: 200,
         headers: {
-            'Content-Type': 'text/xml; charset=utf-8',
+            'Content-Type': 'application/xml; charset=utf-8',
             'Cache-Control': 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
+            'Access-Control-Allow-Origin': '*',
         },
     });
 }
