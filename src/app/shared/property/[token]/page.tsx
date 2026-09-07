@@ -26,6 +26,7 @@ import {
   User,
   X,
 } from "lucide-react";
+import { getPdfThumbnailUrl, getPdfDownloadUrl } from "@/lib/imageSeo";
 
 /* =========================================================
    TYPES
@@ -857,7 +858,19 @@ export default function SharedPropertyPage() {
                         <span className="font-medium text-[#0F2D3A] truncate">{doc.name}</span>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        <button onClick={() => handleViewDoc(doc)} className="px-3 py-1 rounded-lg bg-[#0F2D3A] text-white text-[11px] font-medium">View</button>
+                        <button onClick={() => handleViewDoc(doc)} className="px-3 py-1 rounded-lg bg-[#0F2D3A] text-white text-[11px] font-medium hover:bg-[#153e50] transition">
+                          View
+                        </button>
+                        <a
+                          href={getPdfDownloadUrl(doc.url)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => handleDownloadDoc(doc)}
+                          className="px-3 py-1 rounded-lg bg-[#f0f4f5] text-[#0F2D3A] text-[11px] font-medium flex items-center gap-1 hover:bg-[#e1e8ea] transition"
+                        >
+                          <Download className="w-3 h-3 text-[#cbbf9d]" />
+                          Download
+                        </a>
                       </div>
                     </div>
                   ))}
@@ -1003,14 +1016,39 @@ export default function SharedPropertyPage() {
       {selectedDoc && (
         <div className="fixed inset-0 z-[90] bg-[#0F2D3A]/90 backdrop-blur-md flex items-center justify-center p-4">
           <div className="w-full max-w-4xl h-[88vh] bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col">
-            <div className="h-14 px-5 border-b border-[#e8edee] flex items-center justify-between">
-              <span className="font-semibold text-xs text-[#0F2D3A]">{selectedDoc.name}</span>
-              <button onClick={() => setSelectedDoc(null)} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                <X className="w-4 h-4 text-[#0F2D3A]" />
-              </button>
+            <div className="h-14 px-5 border-b border-[#e8edee] flex items-center justify-between bg-white">
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-[#0F2D3A]" />
+                <span className="font-semibold text-xs text-[#0F2D3A]">{selectedDoc.name}</span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <a
+                  href={getPdfDownloadUrl(selectedDoc.url)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => handleDownloadDoc(selectedDoc)}
+                  className="px-3.5 py-1.5 rounded-full bg-[#0F2D3A] text-white text-xs font-semibold flex items-center gap-1.5 hover:bg-[#153e50] transition shadow-sm"
+                >
+                  <Download className="w-3.5 h-3.5 text-[#cbbf9d]" />
+                  Download PDF
+                </a>
+
+                <button
+                  onClick={() => setSelectedDoc(null)}
+                  className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition"
+                >
+                  <X className="w-4 h-4 text-[#0F2D3A]" />
+                </button>
+              </div>
             </div>
-            <div className="flex-1 p-2 bg-[#f8fafb]">
-              <iframe src={selectedDoc.url} className="w-full h-full rounded-2xl border border-[#e8edee]" title={selectedDoc.name} />
+
+            <div className="flex-1 p-3 bg-[#f8fafb] relative overflow-hidden flex flex-col">
+              <iframe
+                src={selectedDoc.url}
+                className="w-full h-full rounded-2xl border border-[#e8edee] bg-white"
+                title={selectedDoc.name}
+              />
             </div>
           </div>
         </div>

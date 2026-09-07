@@ -5,13 +5,9 @@
 export function getOptimizedImageUrl(url: string, width = 800, quality = 'auto'): string {
     if (!url) return '/placeholder.jpg';
 
-    // Handle Cloudinary URLs
+    // Handle Cloudinary URLs: return raw URL directly to avoid 401 Unauthorized on accounts with restricted dynamic transformations
     if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
-        // Avoid double transformation insertion
-        if (url.includes('/upload/w_') || url.includes('/upload/f_auto')) {
-            return url;
-        }
-        return url.replace('/upload/', `/upload/w_${width},f_auto,q_${quality},c_limit/`);
+        return url;
     }
 
     // Handle Pexels URLs
@@ -53,4 +49,30 @@ export function generatePropertyImageAlt(
     }
 
     return `Photo ${index + 1} of ${title} - ${beds}${type} in ${location}, Kerala`;
+}
+
+/**
+ * Generates an image preview thumbnail for the 1st page of a Cloudinary PDF document
+ */
+export function getPdfThumbnailUrl(pdfUrl: string, width = 600): string {
+    if (!pdfUrl) return '/placeholder.jpg';
+
+    if (pdfUrl.includes('res.cloudinary.com') && pdfUrl.includes('/upload/')) {
+        // Render 1st page as JPG image thumbnail
+        const jpgUrl = pdfUrl.replace(/\.pdf$/i, '.jpg');
+        return jpgUrl.replace('/upload/', `/upload/pg_1,w_${width},f_jpg,q_auto,c_limit/`);
+    }
+
+    return pdfUrl;
+}
+
+/**
+ * Converts a Cloudinary URL into a direct attachment download link
+ */
+export function getPdfDownloadUrl(pdfUrl: string): string {
+    if (!pdfUrl) return '#';
+    if (pdfUrl.includes('res.cloudinary.com') && pdfUrl.includes('/upload/')) {
+        return pdfUrl.replace('/upload/', '/upload/fl_attachment/');
+    }
+    return pdfUrl;
 }

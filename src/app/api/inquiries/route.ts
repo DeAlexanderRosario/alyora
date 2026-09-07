@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dbConnect } from '@/lib/dbConnect';
 import { Inquiry } from '@/models/Inquiry';
-import { inquirySchema } from '@/schemas/inquiry.schema';
 import { verifyAdminToken } from '@/lib/auth-server';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
@@ -25,15 +26,28 @@ export async function POST(req: NextRequest) {
   try {
     await dbConnect();
     const body = await req.json();
-    const parseResult = inquirySchema.safeParse(body);
-    if (!parseResult.success) {
+
+    const name = (body.name || body.leadName || '').trim() || 'Interested Visitor';
+    const email = (body.email || body.leadEmail || '').trim();
+    const phone = (body.phone || body.leadPhone || '').trim();
+    const message = (body.message || '').trim() || 'Inquiry regarding property presentation';
+    const property_name = (body.property_name || body.propertyName || body.title || '').trim() || 'General Inquiry';
+
+    if (!name || (!email && !phone)) {
       return NextResponse.json(
-        { error: 'Validation failed', details: parseResult.error.flatten() },
+        { error: 'Please provide your name and either phone or email.' },
         { status: 400 }
       );
     }
 
-    const inquiry = await Inquiry.create(parseResult.data);
+    const inquiry = await Inquiry.create({
+      name,
+      email: email || (phone ? `${phone}@inquiry.alyora.in` : 'visitor@alyora.in'),
+      phone,
+      message,
+      property_name,
+    });
+
     return NextResponse.json(inquiry, { status: 201 });
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : 'Failed to submit inquiry';

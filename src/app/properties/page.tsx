@@ -7,6 +7,10 @@ import { PropertyCard } from '@/components/PropertyCard';
 import { PropertyFilterBar } from '@/components/PropertyFilterBar';
 import { getPropertiesByFilter, getPublicProperties } from '@/lib/serverData';
 
+// Force dynamic rendering: always fetch latest data from DB
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: 'Property Catalog | Premium Real Estate in Kerala',
   description:

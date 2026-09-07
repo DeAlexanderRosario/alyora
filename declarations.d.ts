@@ -2,6 +2,7 @@ declare module 'lucide-react';
 
 declare module 'next/navigation' {
   export function notFound(): never;
+  export function redirect(url: string, type?: string): never;
   export function useRouter(): {
     push(href: string): void;
     replace(href: string): void;

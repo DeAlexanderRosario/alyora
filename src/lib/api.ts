@@ -144,7 +144,7 @@ async function del(path: string): Promise<void> {
 }
 
 const memoryCache = new Map<string, { data: any; timestamp: number }>();
-const CACHE_TTL_MS = 60000; // 60s cache
+const CACHE_TTL_MS = 10000; // 10s cache — keep fresh after admin changes
 
 function invalidateCache() {
   memoryCache.clear();

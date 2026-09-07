@@ -2,7 +2,14 @@ import dbConnect from './dbConnect';
 import { Property, IProperty } from '@/models/Property';
 import { Location, ILocation } from '@/models/Location';
 import { filterPublicProperty } from './propertyVisibility';
-import { unstable_cache } from 'next/cache';
+import { extractIdFromSlug } from './slug';
+
+/**
+ * Force dynamic rendering for data freshness (no static cache).
+ * Pages importing these functions will always show the latest data.
+ */
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function getPublicProperties(): Promise<any[]> {
     try {
@@ -17,32 +24,66 @@ export async function getPublicProperties(): Promise<any[]> {
     }
 }
 
-export async function getPublicPropertyById(idOrSlug: string): Promise<any | null> {
+/**
+ * Fetch a single PUBLISHED property by slug or raw MongoDB _id.
+ *
+ * Slug format: "property-name-in-location-<6-char-id-suffix>"
+ * We extract the last 6 hex chars and find the matching document.
+ */
+export async function getPublicPropertyBySlug(slugOrId: string): Promise<any | null> {
     try {
         await dbConnect();
-        // Support MongoDB _id or custom slug matching
-        let doc = null;
-        if (idOrSlug.match(/^[0-9a-fA-F]{24}$/)) {
-            doc = await Property.findOne({ _id: idOrSlug, status: 'PUBLISHED' }).lean();
+
+        // 1. If it looks like a full MongoDB ObjectId, look up directly
+        if (/^[0-9a-fA-F]{24}$/.test(slugOrId)) {
+            const doc = await Property.findOne({ _id: slugOrId, status: 'PUBLISHED' }).lean();
+            return doc ? filterPublicProperty(doc) : null;
         }
 
-        if (!doc) {
-            // Try searching by name formatted as slug or regex
-            doc = await Property.findOne({
+        // 2. Extract short ID suffix from slug (last segment after final hyphen)
+        const shortId = extractIdFromSlug(slugOrId);
+
+        if (shortId && /^[0-9a-fA-F]{4,6}$/.test(shortId)) {
+            // Find documents whose _id ends with this suffix
+            const docs = await Property.find({
                 status: 'PUBLISHED',
-                $or: [
-                    { name: new RegExp('^' + idOrSlug.replace(/-/g, ' '), 'i') },
-                    { location: new RegExp('^' + idOrSlug.replace(/-/g, ' '), 'i') },
-                ],
             }).lean();
+
+            const match = docs.find((doc: any) => {
+                const docId = doc._id.toString();
+                return docId.endsWith(shortId);
+            });
+
+            if (match) return filterPublicProperty(match);
         }
 
-        if (!doc) return null;
-        return filterPublicProperty(doc);
+        // 3. Fallback: try searching by name formatted as slug
+        const nameGuess = slugOrId
+            .replace(/-[0-9a-fA-F]{4,6}$/, '') // remove the id suffix
+            .replace(/-in-.*$/, '')             // remove "in-location" part
+            .replace(/-/g, ' ');
+
+        if (nameGuess) {
+            const doc = await Property.findOne({
+                status: 'PUBLISHED',
+                name: new RegExp('^' + nameGuess.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'),
+            }).lean();
+
+            if (doc) return filterPublicProperty(doc);
+        }
+
+        return null;
     } catch (error) {
-        console.error(`Error fetching property by id (${idOrSlug}):`, error);
+        console.error(`Error fetching property by slug (${slugOrId}):`, error);
         return null;
     }
+}
+
+/**
+ * @deprecated Use getPublicPropertyBySlug instead
+ */
+export async function getPublicPropertyById(idOrSlug: string): Promise<any | null> {
+    return getPublicPropertyBySlug(idOrSlug);
 }
 
 export async function getPublicLocations(): Promise<any[]> {

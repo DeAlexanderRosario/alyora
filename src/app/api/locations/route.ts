@@ -4,6 +4,8 @@ import { Location } from '@/models/Location';
 import { locationSchema } from '@/schemas/location.schema';
 import { verifyAdminToken } from '@/lib/auth-server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     await dbConnect();

@@ -19,15 +19,17 @@ export function filterPublicProperty(property: any) {
   delete obj.gpsCoordinates;
 
   // Filter media array to PUBLIC items only
+  // Treat missing/undefined visibility as PUBLIC (default behavior)
   if (Array.isArray(obj.media)) {
-    obj.media = obj.media.filter((m: any) => m.visibility === 'PUBLIC');
+    obj.media = obj.media.filter((m: any) => !m.visibility || m.visibility === 'PUBLIC');
   } else {
     obj.media = [];
   }
 
   // Filter documents array to PUBLIC items only
+  // Treat missing/undefined visibility as PUBLIC (default behavior)
   if (Array.isArray(obj.documents)) {
-    obj.documents = obj.documents.filter((d: any) => d.visibility === 'PUBLIC');
+    obj.documents = obj.documents.filter((d: any) => !d.visibility || d.visibility === 'PUBLIC');
   } else {
     obj.documents = [];
   }

@@ -5,6 +5,8 @@ import { propertySchema } from '@/schemas/property.schema';
 import { verifyAdminToken } from '@/lib/auth-server';
 import { filterPublicProperty } from '@/lib/propertyVisibility';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     await dbConnect();

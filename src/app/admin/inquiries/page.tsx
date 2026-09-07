@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+
+export const dynamic = 'force-dynamic';
 import { Trash2, X, Mail, Phone, MapPin, MessageSquare } from 'lucide-react';
 import { AdminShell } from '@/components/AdminShell';
 import { api, type Inquiry } from '@/lib/api';

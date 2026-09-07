@@ -3,6 +3,8 @@ import { dbConnect } from '@/lib/dbConnect';
 import { AuditLog } from '@/models/AuditLog';
 import { verifyAdminToken } from '@/lib/auth-server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const admin = verifyAdminToken(req);

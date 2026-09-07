@@ -5,6 +5,8 @@ import { Location } from '@/models/Location';
 import { Inquiry } from '@/models/Inquiry';
 import { verifyAdminToken } from '@/lib/auth-server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const admin = verifyAdminToken(req);

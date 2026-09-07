@@ -21,6 +21,10 @@ import { PropertyCard } from '@/components/PropertyCard';
 import { getPublicProperties, getPublicLocations } from '@/lib/serverData';
 import heroImage from '../../assets/images/hero.png';
 
+// Force dynamic rendering: always fetch latest properties from DB
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: 'ALYORA | Premium Real Estate Platform in Kerala',
   description:

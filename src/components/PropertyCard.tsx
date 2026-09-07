@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, BedDouble, Bath, Ruler } from 'lucide-react';
 import { getOptimizedImageUrl, generatePropertyImageAlt } from '@/lib/imageSeo';
+import { generatePropertySlug } from '@/lib/slug';
 
 interface PropertyCardProps {
     property: {
@@ -25,7 +26,7 @@ interface PropertyCardProps {
 }
 
 export function PropertyCard({ property, priority = false }: PropertyCardProps) {
-    const propertyId = property._id || property.id;
+    const propertyId = property._id || property.id || '';
     const rawImg = property.image?.secure_url || property.image_url || '/placeholder.jpg';
     const displayImg = getOptimizedImageUrl(rawImg, 600, 'auto');
     const imageAlt = generatePropertyImageAlt(property, undefined, 0);
@@ -34,9 +35,11 @@ export function PropertyCard({ property, priority = false }: PropertyCardProps) 
     const propertyTitle = property.name || 'Property Listing';
     const locationName = property.location || 'Kerala';
 
+    const slug = generatePropertySlug(propertyTitle, locationName, propertyId);
+
     return (
         <article className="property-card">
-            <Link href={`/properties/${propertyId}`} className="block group">
+            <Link href={`/properties/${slug}`} className="block group">
                 <div className="property-img-wrap relative">
                     <Image
                         src={displayImg}
