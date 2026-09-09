@@ -2,6 +2,7 @@
 
 import React, { ReactNode } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, Home, MapPin, Mail, LogOut, ExternalLink, ShieldCheck, Link2 } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -38,6 +39,7 @@ export function AdminShell({ children, title }: { children: ReactNode; title: st
         }}
       >
         <div>
+          <Image src="/favicon.png" alt="ALYORA" width={52} height={52} style={{ objectFit: 'contain' }} />
           <div style={{ color: '#ffffff', fontSize: 22, letterSpacing: 3, fontWeight: 300 }}>ALYORA</div>
           <div style={{ color: '#5a7a88', fontSize: 11, marginTop: 2 }}>Admin Panel</div>
 

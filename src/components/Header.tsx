@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Menu, X, Phone, Lock, ShieldCheck, Home } from 'lucide-react';
 import { COMPANY_CONFIG } from '@/lib/env';
@@ -36,9 +37,7 @@ export function Header({ transparent = false }: { transparent?: boolean }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[74px] flex items-center justify-between">
           {/* LOGO BRAND */}
           <Link href="/" aria-label="ALYORA Real Estate Homepage" className="flex items-center gap-3 group">
-            <div className="relative w-10 h-10 rounded-full border border-[#cbbf9d] flex items-center justify-center bg-[#153545] text-white shadow-sm transition-transform duration-300 group-hover:scale-105">
-              <span className="serif text-xl font-bold text-[#cbbf9d]">A</span>
-            </div>
+            <Image src="/favicon.png" alt="ALYORA" width={42} height={42} className="w-10 h-10 object-contain transition-transform duration-300 group-hover:scale-105" />
 
             <div className="flex flex-col">
               <span className="serif text-xl tracking-[0.2em] font-normal leading-tight">

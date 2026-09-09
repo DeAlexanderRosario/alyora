@@ -1,5 +1,7 @@
 declare module 'lucide-react';
 
+declare module '*.css';
+
 declare module 'next/navigation' {
   export function notFound(): never;
   export function redirect(url: string, type?: string): never;

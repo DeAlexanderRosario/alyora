@@ -5,25 +5,27 @@ import Link from "next/link";
 import {
     AlertCircle,
     ArrowRight,
+    Bath,
+    Bed,
     CheckCircle,
     ChevronLeft,
     ChevronRight,
     Download,
     Eye,
+    FileCheck,
     FileText,
+    Layers,
     Lock,
     MapPin,
     Maximize2,
+    Menu,
     Phone,
+    Play,
     ShieldCheck,
     User,
     X,
 } from "lucide-react";
 import { getPdfThumbnailUrl, getPdfDownloadUrl } from "@/lib/imageSeo";
-
-/* =========================================================
-   TYPES
-========================================================= */
 
 interface MediaAsset {
     id?: string;
@@ -100,10 +102,7 @@ function buildWhatsAppUrl(propertyName: string) {
     return `https://wa.me/?text=${encodedMessage}`;
 }
 
-export function SharedPropertyClient({ token }: { token: string }) {
-    /* -------------------------
-       Main state
-    ------------------------- */
+export default function SharedPropertyClient({ token }: { token: string }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -117,19 +116,11 @@ export function SharedPropertyClient({ token }: { token: string }) {
     const [salespersonId, setSalespersonId] = useState("");
     const [permissions, setPermissions] = useState<any>({});
 
-    /* -------------------------
-       Gallery
-    ------------------------- */
+    const [activeMediaTab, setActiveMediaTab] = useState<"photos" | "videos" | "floorplans">("photos");
     const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
 
-    /* -------------------------
-       Documents
-    ------------------------- */
     const [selectedDoc, setSelectedDoc] = useState<PropertyDocument | null>(null);
 
-    /* -------------------------
-       Inquiry
-    ------------------------- */
     const [inquiryName, setInquiryName] = useState("");
     const [inquiryPhone, setInquiryPhone] = useState("");
     const [inquiryEmail, setInquiryEmail] = useState("");
@@ -138,9 +129,7 @@ export function SharedPropertyClient({ token }: { token: string }) {
     const [inquirySubmitting, setInquirySubmitting] = useState(false);
     const [inquirySuccess, setInquirySuccess] = useState(false);
 
-    /* =========================================================
-       FETCH PROPERTY
-    ========================================================= */
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const fetchPropertyData = async (codeToTry?: string) => {
         setLoading(true);
@@ -149,7 +138,6 @@ export function SharedPropertyClient({ token }: { token: string }) {
 
         try {
             let url = `/api/shared/${token}`;
-
             if (codeToTry) {
                 url += `?passcode=${encodeURIComponent(codeToTry)}`;
             }
@@ -164,11 +152,9 @@ export function SharedPropertyClient({ token }: { token: string }) {
             if (res.status === 401 && data.requiresPasscode) {
                 setRequiresPasscode(true);
                 setLoading(false);
-
                 if (codeToTry) {
                     setPasscodeError("Incorrect passcode. Please try again.");
                 }
-
                 return;
             }
 
@@ -180,7 +166,6 @@ export function SharedPropertyClient({ token }: { token: string }) {
 
             setRequiresPasscode(false);
             setProperty(data.property);
-
             setLeadName(data.leadName || "");
             setSalespersonId(data.salespersonId || "");
             setPermissions({
@@ -202,7 +187,6 @@ export function SharedPropertyClient({ token }: { token: string }) {
             if (data.leadPhone) setInquiryPhone(data.leadPhone);
             if (data.leadEmail) setInquiryEmail(data.leadEmail);
         } catch (err) {
-            console.error("Error loading shared property:", err);
             setError("An error occurred while connecting to ALYORA.");
         } finally {
             setLoading(false);
@@ -215,24 +199,14 @@ export function SharedPropertyClient({ token }: { token: string }) {
         }
     }, [token]);
 
-    /* =========================================================
-       PASSCODE
-    ========================================================= */
-
     const handlePasscodeSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-
         if (!passcode.trim()) {
             setPasscodeError("Please enter the access code.");
             return;
         }
-
         fetchPropertyData(passcode);
     };
-
-    /* =========================================================
-       DOCUMENT AUDIT
-    ========================================================= */
 
     const handleLogDocAudit = async (
         docName: string,
@@ -241,13 +215,8 @@ export function SharedPropertyClient({ token }: { token: string }) {
         try {
             await fetch(`/api/shared/${token}/audit`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    action,
-                    documentName: docName,
-                }),
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action, documentName: docName }),
             });
         } catch (err) {
             console.error("Audit log error:", err);
@@ -264,13 +233,8 @@ export function SharedPropertyClient({ token }: { token: string }) {
         window.open(doc.url, "_blank", "noopener,noreferrer");
     };
 
-    /* =========================================================
-       INQUIRY
-    ========================================================= */
-
     const handleInquirySubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
         if (!property) return;
 
         setInquirySubmitting(true);
@@ -279,18 +243,14 @@ export function SharedPropertyClient({ token }: { token: string }) {
         try {
             const res = await fetch("/api/inquiries", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     propertyId: property._id,
                     propertyName: property.name,
                     name: inquiryName,
                     phone: inquiryPhone,
                     email: inquiryEmail,
-                    message:
-                        inquiryMessage ||
-                        `Inquiry from shared property link for property: ${property.name}`,
+                    message: inquiryMessage || `Inquiry from shared property link for: ${property.name}`,
                     source: `SHARE_LINK_${token}`,
                     salespersonId: salespersonId || undefined,
                 }),
@@ -303,106 +263,59 @@ export function SharedPropertyClient({ token }: { token: string }) {
                 alert("Failed to send inquiry. Please try again.");
             }
         } catch (err) {
-            console.error("Inquiry error:", err);
             alert("Network error. Please try again.");
         } finally {
             setInquirySubmitting(false);
         }
     };
 
-    /* =========================================================
-       MEDIA
-    ========================================================= */
-
     const photos = useMemo(() => {
-        return (
-            property?.media?.filter(
-                (media) => media.type === "photo" || !media.type
-            ) || []
-        );
+        return property?.media?.filter((m) => m.type === "photo" || !m.type) || [];
     }, [property]);
 
-    const openPhoto = (index: number) => {
-        setSelectedPhotoIndex(index);
-    };
+    const videos = useMemo(() => {
+        return property?.media?.filter((m) => m.type === "video") || [];
+    }, [property]);
 
-    const closePhoto = () => {
-        setSelectedPhotoIndex(null);
-    };
+    const floorplans = useMemo(() => {
+        return property?.media?.filter((m) => m.type === "floorplan") || [];
+    }, [property]);
 
+    const openPhoto = (index: number) => setSelectedPhotoIndex(index);
+    const closePhoto = () => setSelectedPhotoIndex(null);
     const previousPhoto = () => {
         if (selectedPhotoIndex === null || photos.length === 0) return;
-        setSelectedPhotoIndex(
-            selectedPhotoIndex === 0
-                ? photos.length - 1
-                : selectedPhotoIndex - 1
-        );
+        setSelectedPhotoIndex(selectedPhotoIndex === 0 ? photos.length - 1 : selectedPhotoIndex - 1);
     };
-
     const nextPhoto = () => {
         if (selectedPhotoIndex === null || photos.length === 0) return;
-        setSelectedPhotoIndex(
-            selectedPhotoIndex === photos.length - 1
-                ? 0
-                : selectedPhotoIndex + 1
-        );
+        setSelectedPhotoIndex(selectedPhotoIndex === photos.length - 1 ? 0 : selectedPhotoIndex + 1);
     };
 
     useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
+        const handleKeyDown = (e: KeyboardEvent) => {
             if (selectedPhotoIndex === null) return;
-            if (event.key === "Escape") closePhoto();
-            if (event.key === "ArrowLeft") previousPhoto();
-            if (event.key === "ArrowRight") nextPhoto();
+            if (e.key === "Escape") closePhoto();
+            if (e.key === "ArrowLeft") previousPhoto();
+            if (e.key === "ArrowRight") nextPhoto();
         };
-
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [selectedPhotoIndex, photos.length]);
 
-    /* =========================================================
-       LOADING
-    ========================================================= */
-
     if (loading) {
         return (
-            <>
-                <style jsx global>{`
-          @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap");
-
-          :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f7f9f9;
-            --brand-navy: #153545;
-            --brand-gold: #cbbf9d;
-            --text-muted: #657176;
-          }
-
-          * { box-sizing: border-box; }
-          body { margin: 0; font-family: "Outfit", sans-serif; }
-          .serif { font-family: "Playfair Display", Georgia, serif; }
-        `}</style>
-
-                <div className="min-h-screen bg-white flex items-center justify-center px-6">
-                    <div className="text-center">
-                        <div className="w-12 h-12 rounded-full border border-[#cbbf9d] flex items-center justify-center mx-auto mb-5">
-                            <span className="serif text-xl text-[#153545]">A</span>
-                        </div>
-
-                        <div className="w-5 h-5 border-2 border-[#153545]/20 border-t-[#153545] rounded-full animate-spin mx-auto mb-4" />
-
-                        <p className="text-[10px] uppercase tracking-[0.2em] text-[#657176]">
-                            Preparing property
-                        </p>
+            <div className="min-h-screen bg-white flex items-center justify-center px-6">
+                <div className="text-center">
+                    <div className="w-12 h-12 rounded-full border border-[#cbbf9d] flex items-center justify-center mx-auto mb-5">
+                        <span className="serif text-xl text-[#153545]">A</span>
                     </div>
+                    <div className="w-5 h-5 border-2 border-[#153545]/20 border-t-[#153545] rounded-full animate-spin mx-auto mb-4" />
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#657176]">Preparing property presentation...</p>
                 </div>
-            </>
+            </div>
         );
     }
-
-    /* =========================================================
-       PASSCODE SCREEN
-    ========================================================= */
 
     if (requiresPasscode) {
         return (
@@ -412,27 +325,16 @@ export function SharedPropertyClient({ token }: { token: string }) {
                         <div className="w-14 h-14 rounded-full border border-[#cbbf9d] flex items-center justify-center mx-auto mb-6">
                             <Lock className="w-5 h-5 text-[#153545]" />
                         </div>
-
-                        <p className="text-[10px] uppercase tracking-[0.22em] text-[#9a8a68] mb-3">
-                            Private Property
-                        </p>
-
-                        <h1 className="serif text-3xl text-[#153545]">
-                            Private access
-                        </h1>
-
+                        <p className="text-[10px] uppercase tracking-[0.22em] text-[#9a8a68] mb-3">Private Property</p>
+                        <h1 className="serif text-3xl text-[#153545]">Private Access</h1>
                         <p className="text-sm text-[#657176] leading-relaxed mt-4">
-                            This property presentation is protected. Enter the access code
-                            provided by ALYORA to continue.
+                            This property presentation is protected. Enter the access code provided by ALYORA to continue.
                         </p>
                     </div>
 
                     <form onSubmit={handlePasscodeSubmit} className="mt-8 space-y-4">
                         <div>
-                            <label className="block text-[10px] uppercase tracking-[0.15em] font-medium text-[#657176] mb-2">
-                                Access code
-                            </label>
-
+                            <label className="block text-[10px] uppercase tracking-[0.15em] font-medium text-[#657176] mb-2">Access Code</label>
                             <input
                                 type="password"
                                 value={passcode}
@@ -441,7 +343,6 @@ export function SharedPropertyClient({ token }: { token: string }) {
                                 autoFocus
                                 className="w-full h-12 rounded-xl border border-[#dfe5e5] bg-white px-4 text-center tracking-[0.25em] text-[#153545] outline-none focus:border-[#9a8a68] transition"
                             />
-
                             {passcodeError && (
                                 <p className="mt-2 text-xs text-red-500 flex items-center gap-1">
                                     <AlertCircle className="w-3.5 h-3.5" />
@@ -454,24 +355,14 @@ export function SharedPropertyClient({ token }: { token: string }) {
                             type="submit"
                             className="w-full h-12 rounded-xl bg-[#153545] text-white text-sm font-medium hover:bg-[#1e4559] transition flex items-center justify-center gap-2"
                         >
-                            Unlock presentation
+                            Unlock Presentation
                             <ArrowRight className="w-4 h-4" />
                         </button>
                     </form>
-
-                    <div className="border-t border-[#e8edee] mt-8 pt-5 text-center">
-                        <p className="text-[10px] tracking-[0.14em] uppercase text-[#9ab4be]">
-                            ALYORA
-                        </p>
-                    </div>
                 </div>
             </div>
         );
     }
-
-    /* =========================================================
-       ERROR SCREEN
-    ========================================================= */
 
     if (error || !property) {
         return (
@@ -480,33 +371,21 @@ export function SharedPropertyClient({ token }: { token: string }) {
                     <div className="w-14 h-14 rounded-full bg-red-50 border border-red-100 flex items-center justify-center mx-auto mb-5">
                         <AlertCircle className="w-6 h-6 text-red-500" />
                     </div>
-
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#9a8a68] mb-2">
-                        ALYORA
-                    </p>
-
-                    <h1 className="serif text-3xl text-[#153545]">
-                        Access unavailable
-                    </h1>
-
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#9a8a68] mb-2">ALYORA</p>
+                    <h1 className="serif text-3xl text-[#153545]">Access Unavailable</h1>
                     <p className="text-sm text-[#657176] leading-relaxed mt-4">
                         {error || "This property presentation could not be loaded."}
                     </p>
-
                     <Link
                         href="/"
                         className="inline-flex items-center gap-2 mt-7 px-5 py-3 rounded-full bg-[#153545] text-white text-sm font-medium hover:bg-[#1e4559] transition"
                     >
-                        Return home
+                        Return Home
                     </Link>
                 </div>
             </div>
         );
     }
-
-    /* =========================================================
-       MAIN PAGE - MINIMAL LUXURY ONE-PAGE PRESENTATION
-    ========================================================= */
 
     const coverImageUrl =
         property.image?.secure_url ||
@@ -516,23 +395,6 @@ export function SharedPropertyClient({ token }: { token: string }) {
 
     return (
         <div className="min-h-screen bg-white text-[#0F2D3A] flex flex-col font-sans selection:bg-[#cbbf9d] selection:text-[#0F2D3A]">
-            <style jsx global>{`
-        @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap");
-
-        body {
-          margin: 0;
-          font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-          background: #ffffff;
-          color: #0F2D3A;
-          -webkit-font-smoothing: antialiased;
-        }
-
-        .serif {
-          font-family: "Playfair Display", Georgia, serif;
-        }
-      `}</style>
-
-            {/* TOP NAVIGATION */}
             <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[#e8edee]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2.5 group">
@@ -564,10 +426,7 @@ export function SharedPropertyClient({ token }: { token: string }) {
                 </div>
             </header>
 
-            {/* MAIN CONTENT CONTAINER */}
             <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 flex flex-col gap-6">
-
-                {/* 1. HERO SECTION */}
                 <div className="relative w-full h-[38vh] sm:h-[42vh] min-h-[260px] max-h-[440px] rounded-3xl overflow-hidden shadow-xl group border border-[#e8edee]">
                     <img
                         src={coverImageUrl}
@@ -608,24 +467,22 @@ export function SharedPropertyClient({ token }: { token: string }) {
                     </div>
                 </div>
 
-                {/* 2. GRID DETAILS */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                     <div className="lg:col-span-2 space-y-6">
-
                         <div className="grid grid-cols-3 gap-3 sm:gap-4 bg-[#f8fafb] p-4 rounded-2xl border border-[#e8edee]">
-                            <div className="bg-white p-3.5 rounded-xl border border-[#e8edee] shadow-2xs">
+                            <div className="bg-white p-3.5 rounded-xl border border-[#e8edee]">
                                 <p className="text-[9px] uppercase tracking-wider font-bold text-[#657176] mb-1">Property Type</p>
                                 <p className="font-semibold text-sm text-[#0F2D3A] truncate">{property.propertyType || "Commercial / Shop"}</p>
                             </div>
 
-                            <div className="bg-white p-3.5 rounded-xl border border-[#e8edee] shadow-2xs">
+                            <div className="bg-white p-3.5 rounded-xl border border-[#e8edee]">
                                 <p className="text-[9px] uppercase tracking-wider font-bold text-[#657176] mb-1">Category / Size</p>
                                 <p className="font-semibold text-sm text-[#0F2D3A] truncate">
                                     {property.area ? `${property.area} sqft` : property.plot ? `${property.plot} Plot` : property.beds ? `${property.beds} Bed / ${property.baths || 0} Bath` : property.tag || "Standard"}
                                 </p>
                             </div>
 
-                            <div className="bg-[#white] p-3.5 rounded-xl border border-[#e8edee] shadow-2xs">
+                            <div className="bg-white p-3.5 rounded-xl border border-[#e8edee]">
                                 <p className="text-[9px] uppercase tracking-wider font-bold text-[#657176] mb-1">Location</p>
                                 <p className="font-semibold text-sm text-[#0F2D3A] truncate">{property.location?.split(',')[0] || "Prime Area"}</p>
                             </div>
@@ -645,39 +502,6 @@ export function SharedPropertyClient({ token }: { token: string }) {
                             </div>
                         )}
 
-                        {((permissions.showAmenities !== false && property.amenities && property.amenities.length > 0) ||
-                            (permissions.showSpecifications !== false && property.specifications && property.specifications.length > 0)) && (
-                                <div className="bg-[#f8fafb] p-5 rounded-2xl border border-[#e8edee] space-y-4">
-                                    {permissions.showAmenities !== false && property.amenities && property.amenities.length > 0 && (
-                                        <div>
-                                            <p className="text-[10px] uppercase tracking-wider font-bold text-[#657176] mb-2.5">Amenities</p>
-                                            <div className="flex flex-wrap gap-2">
-                                                {property.amenities.map((item, i) => (
-                                                    <span key={i} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#e8edee] text-xs font-medium text-[#0F2D3A] shadow-2xs">
-                                                        <CheckCircle className="w-3 h-3 text-[#2E7D32]" />
-                                                        {item}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {permissions.showSpecifications !== false && property.specifications && property.specifications.length > 0 && (
-                                        <div>
-                                            <p className="text-[10px] uppercase tracking-wider font-bold text-[#657176] mb-2.5">Specifications</p>
-                                            <div className="grid grid-cols-2 gap-2">
-                                                {property.specifications.map((spec, i) => (
-                                                    <div key={i} className="bg-white p-2.5 rounded-xl border border-[#e8edee] flex justify-between items-center text-xs">
-                                                        <span className="text-[#657176] font-medium">{spec.key}</span>
-                                                        <span className="font-semibold text-[#0F2D3A]">{spec.value}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-
                         {photos.length > 0 && (
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between">
@@ -687,7 +511,7 @@ export function SharedPropertyClient({ token }: { token: string }) {
                                 </div>
 
                                 <div className="grid grid-cols-3 gap-3">
-                                    {photos.slice(0, 3).map((photo, index) => (
+                                    {photos.slice(0, 6).map((photo, index) => (
                                         <div
                                             key={index}
                                             onClick={() => openPhoto(index)}
@@ -696,246 +520,75 @@ export function SharedPropertyClient({ token }: { token: string }) {
                                             <img
                                                 src={photo.secure_url}
                                                 alt={photo.caption || `Photo ${index + 1}`}
-                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                                             />
-                                            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors flex items-center justify-center">
-                                                <Maximize2 className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                                            </div>
                                         </div>
                                     ))}
                                 </div>
                             </div>
                         )}
-
-                        {permissions.showOwnerDetails && (property.ownerDetails?.name || property.ownerDetails?.phone || property.brokerDetails?.name) && (
-                            <div className="bg-amber-500/5 border border-amber-500/20 p-5 rounded-2xl space-y-4">
-                                <div className="flex items-center justify-between border-b border-amber-500/20 pb-2">
-                                    <div className="flex items-center gap-2">
-                                        <User className="w-4 h-4 text-amber-600" />
-                                        <h3 className="text-xs uppercase tracking-wider font-bold text-[#0F2D3A]">Confidential Contacts</h3>
-                                    </div>
-                                    <span className="text-[9px] bg-amber-500 text-white font-bold px-2 py-0.5 rounded">PRIVATE</span>
-                                </div>
-
-                                <div className="grid sm:grid-cols-2 gap-4 text-xs">
-                                    {property.ownerDetails && (property.ownerDetails.name || property.ownerDetails.phone) && (
-                                        <div className="bg-white p-3.5 rounded-xl border border-amber-500/20 space-y-1.5">
-                                            <p className="text-[10px] uppercase font-bold text-gray-500">Owner Details</p>
-                                            {property.ownerDetails.name && <p className="font-semibold text-[#0F2D3A]">{property.ownerDetails.name}</p>}
-                                            {property.ownerDetails.phone && (
-                                                <p><a href={`tel:${property.ownerDetails.phone}`} className="font-semibold text-blue-600 hover:underline">{property.ownerDetails.phone}</a></p>
-                                            )}
-                                            {property.ownerDetails.notes && <p className="text-gray-500 text-[11px]">{property.ownerDetails.notes}</p>}
-                                        </div>
-                                    )}
-
-                                    {property.brokerDetails && (property.brokerDetails.name || property.brokerDetails.phone) && (
-                                        <div className="bg-white p-3.5 rounded-xl border border-amber-500/20 space-y-1.5">
-                                            <p className="text-[10px] uppercase font-bold text-gray-500">Broker / Agency</p>
-                                            {property.brokerDetails.name && <p className="font-semibold text-[#0F2D3A]">{property.brokerDetails.name}</p>}
-                                            {property.brokerDetails.agency && <p className="text-gray-500">{property.brokerDetails.agency}</p>}
-                                            {property.brokerDetails.phone && (
-                                                <p><a href={`tel:${property.brokerDetails.phone}`} className="font-semibold text-blue-600 hover:underline">{property.brokerDetails.phone}</a></p>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-
-                        {permissions.showPublicDocuments !== false && property.documents && property.documents.length > 0 && (
-                            <div className="bg-[#f8fafb] p-4 rounded-2xl border border-[#e8edee] space-y-3">
-                                <p className="text-[10px] uppercase tracking-wider font-bold text-[#657176]">Property Documents</p>
-                                <div className="space-y-2">
-                                    {property.documents.map((doc, idx) => (
-                                        <div key={idx} className="bg-white p-3 rounded-xl border border-[#e8edee] flex items-center justify-between text-xs">
-                                            <div className="flex items-center gap-2.5 min-w-0">
-                                                <FileText className="w-4 h-4 text-[#0F2D3A] shrink-0" />
-                                                <span className="font-medium text-[#0F2D3A] truncate">{doc.name}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2 shrink-0">
-                                                <button onClick={() => handleViewDoc(doc)} className="px-3 py-1 rounded-lg bg-[#0F2D3A] text-white text-[11px] font-medium hover:bg-[#153e50] transition">
-                                                    View
-                                                </button>
-                                                <a
-                                                    href={getPdfDownloadUrl(doc.url)}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    onClick={() => handleDownloadDoc(doc)}
-                                                    className="px-3 py-1 rounded-lg bg-[#f0f4f5] text-[#0F2D3A] text-[11px] font-medium flex items-center gap-1 hover:bg-[#e1e8ea] transition"
-                                                >
-                                                    <Download className="w-3 h-3 text-[#cbbf9d]" />
-                                                    Download
-                                                </a>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
                     </div>
 
-                    <div className="lg:col-span-1 sticky top-20">
-                        <div className="bg-[#0F2D3A] text-white p-6 sm:p-7 rounded-3xl shadow-xl border border-[#0F2D3A] space-y-6">
+                    <div className="bg-[#0F2D3A] text-white p-6 rounded-3xl space-y-4 shadow-xl">
+                        <span className="text-[10px] uppercase tracking-[0.2em] text-[#cbbf9d] font-bold">Direct Inquiry</span>
+                        <h3 className="serif text-xl font-normal text-white">Inquire About This Property</h3>
+                        <p className="text-xs text-white/80 leading-relaxed">
+                            Connect directly with ALYORA property advisors regarding title verification, pricing, or viewing schedules.
+                        </p>
 
-                            <div className="space-y-2">
-                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-[#cbbf9d] text-[10px] uppercase tracking-wider font-semibold">
-                                    <ShieldCheck className="w-3 h-3" />
-                                    Verified Presentation
-                                </div>
-                                <h3 className="serif text-2xl font-bold text-white">Interested in this property?</h3>
-                                <p className="text-xs text-white/70 leading-relaxed">
-                                    Book a private viewing or connect directly with our dedicated ALYORA advisor.
-                                </p>
-                            </div>
+                        <form onSubmit={handleInquirySubmit} className="space-y-3 pt-2">
+                            <input
+                                type="text"
+                                required
+                                placeholder="Your Full Name"
+                                value={inquiryName}
+                                onChange={(e) => setInquiryName(e.target.value)}
+                                className="w-full h-10 rounded-xl bg-white/10 text-white placeholder-white/50 px-3.5 text-xs outline-none border border-white/15 focus:border-[#cbbf9d]"
+                            />
 
-                            <a
-                                href={buildWhatsAppUrl(property.name)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-full bg-[#cbbf9d] hover:bg-[#b8ab87] text-[#0F2D3A] font-bold py-3.5 px-5 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm text-center"
+                            <input
+                                type="tel"
+                                required
+                                placeholder="Phone Number"
+                                value={inquiryPhone}
+                                onChange={(e) => setInquiryPhone(e.target.value)}
+                                className="w-full h-10 rounded-xl bg-white/10 text-white placeholder-white/50 px-3.5 text-xs outline-none border border-white/15 focus:border-[#cbbf9d]"
+                            />
+
+                            <button
+                                type="submit"
+                                disabled={inquirySubmitting}
+                                className="w-full h-11 bg-[#cbbf9d] text-[#0F2D3A] font-bold rounded-xl text-xs hover:bg-[#d8ccaa] transition shadow"
                             >
-                                <Phone className="w-4 h-4" />
-                                <span>Schedule Private Viewing</span>
-                            </a>
-
-                            <div className="bg-white/5 p-3 rounded-xl border border-white/10 flex items-center gap-2.5 text-xs text-white/80">
-                                <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-                                <span>Only one private unit available for this key location.</span>
-                            </div>
-
-                            <div className="border-t border-white/10 pt-4 space-y-3">
-                                <p className="text-[10px] uppercase tracking-wider font-bold text-white/60">Request Callback</p>
-
-                                {inquirySuccess ? (
-                                    <div className="bg-emerald-500/20 border border-emerald-500/40 p-3 rounded-xl text-center text-xs text-emerald-300">
-                                        ✓ Request sent! Our team will contact you shortly.
-                                    </div>
-                                ) : (
-                                    <form onSubmit={handleInquirySubmit} className="space-y-2.5">
-                                        <input
-                                            type="text"
-                                            placeholder="Your Name"
-                                            required
-                                            value={inquiryName}
-                                            onChange={(e) => setInquiryName(e.target.value)}
-                                            className="w-full bg-white/10 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-[#cbbf9d]"
-                                        />
-                                        <input
-                                            type="tel"
-                                            placeholder="Phone Number"
-                                            required
-                                            value={inquiryPhone}
-                                            onChange={(e) => setInquiryPhone(e.target.value)}
-                                            className="w-full bg-white/10 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-[#cbbf9d]"
-                                        />
-                                        <button
-                                            type="submit"
-                                            disabled={inquirySubmitting}
-                                            className="w-full bg-white/15 hover:bg-white/20 text-white font-semibold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5"
-                                        >
-                                            {inquirySubmitting ? "Sending..." : "Request Call"}
-                                            <ArrowRight className="w-3.5 h-3.5" />
-                                        </button>
-                                    </form>
-                                )}
-                            </div>
-
-                        </div>
+                                {inquirySubmitting ? "Submitting..." : "Request Call Back"}
+                            </button>
+                            {inquirySuccess && (
+                                <p className="text-xs text-emerald-400 font-semibold text-center mt-2">
+                                    Inquiry sent successfully! Our advisor will contact you.
+                                </p>
+                            )}
+                        </form>
                     </div>
-
                 </div>
-
             </main>
 
-            {/* FOOTER */}
-            <footer className="border-t border-[#e8edee] py-4 mt-8 bg-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#657176] gap-2">
-                    <div className="flex items-center gap-2">
-                        <span className="serif font-bold text-[#0F2D3A]">ALYORA</span>
-                        <span>· Property Presentation</span>
-                    </div>
-                    <p className="text-[11px]">© {new Date().getFullYear()} ALYORA Real Estate. All rights reserved.</p>
-                </div>
-            </footer>
-
-            {/* PHOTO LIGHTBOX MODAL */}
-            {selectedPhotoIndex !== null && photos[selectedPhotoIndex] && (
-                <div className="fixed inset-0 z-[100] bg-[#0F2D3A]/95 backdrop-blur-md flex items-center justify-center p-4">
-                    <button
-                        onClick={closePhoto}
-                        className="absolute top-5 right-5 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition"
-                    >
-                        <X className="w-5 h-5" />
+            {/* LIGHTBOX MODAL */}
+            {selectedPhotoIndex !== null && (
+                <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4">
+                    <button onClick={closePhoto} className="absolute top-4 right-4 text-white p-2">
+                        <X size={24} />
                     </button>
-
-                    <button
-                        onClick={previousPhoto}
-                        className="absolute left-4 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition"
-                    >
-                        <ChevronLeft className="w-5 h-5" />
+                    <button onClick={previousPhoto} className="absolute left-4 text-white p-2">
+                        <ChevronLeft size={32} />
                     </button>
-
-                    <div className="max-w-5xl max-h-[85vh] flex flex-col items-center">
-                        <img
-                            src={photos[selectedPhotoIndex].secure_url}
-                            alt={photos[selectedPhotoIndex].caption || property.name}
-                            className="max-h-[75vh] max-w-full object-contain rounded-2xl shadow-2xl"
-                        />
-                        <p className="text-white/80 text-xs mt-3">
-                            {selectedPhotoIndex + 1} / {photos.length}
-                        </p>
-                    </div>
-
-                    <button
-                        onClick={nextPhoto}
-                        className="absolute right-4 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition"
-                    >
-                        <ChevronRight className="w-5 h-5" />
+                    <img
+                        src={photos[selectedPhotoIndex].secure_url}
+                        alt="Enlarged property photo"
+                        className="max-h-[80vh] max-w-[90vw] object-contain rounded-xl"
+                    />
+                    <button onClick={nextPhoto} className="absolute right-4 text-white p-2">
+                        <ChevronRight size={32} />
                     </button>
-                </div>
-            )}
-
-            {/* PDF DOCUMENT PREVIEW MODAL */}
-            {selectedDoc && (
-                <div className="fixed inset-0 z-[90] bg-[#0F2D3A]/90 backdrop-blur-md flex items-center justify-center p-4">
-                    <div className="w-full max-w-4xl h-[88vh] bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col">
-                        <div className="h-14 px-5 border-b border-[#e8edee] flex items-center justify-between bg-white">
-                            <div className="flex items-center gap-2">
-                                <FileText className="w-4 h-4 text-[#0F2D3A]" />
-                                <span className="font-semibold text-xs text-[#0F2D3A]">{selectedDoc.name}</span>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                <a
-                                    href={getPdfDownloadUrl(selectedDoc.url)}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    onClick={() => handleDownloadDoc(selectedDoc)}
-                                    className="px-3.5 py-1.5 rounded-full bg-[#0F2D3A] text-white text-xs font-semibold flex items-center gap-1.5 hover:bg-[#153e50] transition shadow-sm"
-                                >
-                                    <Download className="w-3.5 h-3.5 text-[#cbbf9d]" />
-                                    Download PDF
-                                </a>
-
-                                <button
-                                    onClick={() => setSelectedDoc(null)}
-                                    className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition"
-                                >
-                                    <X className="w-4 h-4 text-[#0F2D3A]" />
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="flex-1 p-3 bg-[#f8fafb] relative overflow-hidden flex flex-col">
-                            <iframe
-                                src={selectedDoc.url}
-                                className="w-full h-full rounded-2xl border border-[#e8edee] bg-white"
-                                title={selectedDoc.name}
-                            />
-                        </div>
-                    </div>
                 </div>
             )}
         </div>

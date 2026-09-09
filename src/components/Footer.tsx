@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Phone, Mail, MapPin, MessageCircle, Instagram, Facebook, Youtube, Linkedin, ArrowUpRight } from 'lucide-react';
 import { COMPANY_CONFIG } from '@/lib/env';
 
@@ -15,9 +16,7 @@ export function Footer() {
           {/* BRAND COLUMN */}
           <div className="md:col-span-1 flex flex-col items-center md:items-start text-center md:text-left space-y-4">
             <Link href="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full border border-[#cbbf9d] bg-[#153545] flex items-center justify-center">
-                <span className="serif text-xl font-bold text-[#cbbf9d]">A</span>
-              </div>
+              <Image src="/favicon.png" alt="ALYORA" width={42} height={42} className="w-10 h-10 object-contain" />
               <div className="flex flex-col text-left">
                 <span className="serif text-xl tracking-[0.2em] font-normal text-white">ALYORA</span>
                 <span className="text-[8px] uppercase tracking-[0.2em] text-[#b8ced6]">Where Life Finds Its Place.</span>
