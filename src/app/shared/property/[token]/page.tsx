@@ -466,12 +466,12 @@ export default function SharedPropertyPage() {
 
         <div className="min-h-screen bg-white flex items-center justify-center px-6">
           <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-5">
+            <div className="w-20 h-20 mx-auto mb-5">
               <Image
                 src="/favicon.png?v=3"
                 alt="ALYORA"
-                width={64}
-                height={64}
+                width={77}
+                height={77}
                 className="w-full h-full object-contain"
               />
             </div>
@@ -496,12 +496,12 @@ export default function SharedPropertyPage() {
       <div className="min-h-screen bg-[#f7f9f9] text-[#153545] flex items-center justify-center px-5">
         <div className="w-full max-w-md bg-white rounded-[24px] border border-[#e8edee] shadow-[0_20px_60px_rgba(21,53,69,0.08)] p-8 sm:p-10">
           <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-6">
+            <div className="w-20 h-20 mx-auto mb-6">
               <Image
                 src="/favicon.png?v=3"
                 alt="ALYORA"
-                width={64}
-                height={64}
+                width={77}
+                height={77}
                 className="w-full h-full object-contain"
               />
             </div>

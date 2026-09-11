@@ -37,7 +37,7 @@ export function Header({ transparent = false }: { transparent?: boolean }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[74px] flex items-center justify-between">
           {/* LOGO BRAND */}
           <Link href="/" aria-label="ALYORA Real Estate Homepage" className="flex items-center gap-3 group">
-                        <Image src="/favicon.png?v=3" alt="ALYORA" width={42} height={42} className="w-10 h-10 object-contain transition-transform duration-300 group-hover:scale-105" />
+                        <Image src="/favicon.png?v=3" alt="ALYORA" width={50} height={50} className="w-12 h-12 object-contain transition-transform duration-300 group-hover:scale-105" />
 
             <div className="flex flex-col">
               <span className="serif text-xl tracking-[0.2em] font-normal leading-tight">
