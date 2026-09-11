@@ -73,8 +73,8 @@ export const metadata: Metadata = {
     ],
   },
   icons: {
-    icon: '/favicon.png?v=2',
-    apple: '/favicon.png?v=2',
+    icon: '/favicon.png?v=3',
+    apple: '/favicon.png?v=3',
   },
   verification: {
     google: 'google6fef9ad0c9d3fd19',

@@ -16,7 +16,7 @@ export function Footer() {
           {/* BRAND COLUMN */}
           <div className="md:col-span-1 flex flex-col items-center md:items-start text-center md:text-left space-y-4">
             <Link href="/" className="flex items-center gap-3">
-              <Image src="/favicon.png?v=2" alt="ALYORA" width={42} height={42} className="w-10 h-10 object-contain" />
+              <Image src="/favicon.png?v=3" alt="ALYORA" width={42} height={42} className="w-10 h-10 object-contain" />
               <div className="flex flex-col text-left">
                 <span className="serif text-xl tracking-[0.2em] font-normal text-white">ALYORA</span>
                 <span className="text-[8px] uppercase tracking-[0.2em] text-[#b8ced6]">Where Life Finds Its Place.</span>
