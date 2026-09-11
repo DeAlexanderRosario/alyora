@@ -468,7 +468,7 @@ export default function SharedPropertyPage() {
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-5">
               <Image
-                src="/favicon.png"
+                src="/favicon.png?v=2"
                 alt="ALYORA"
                 width={64}
                 height={64}
@@ -498,7 +498,7 @@ export default function SharedPropertyPage() {
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-6">
               <Image
-                src="/favicon.png"
+                src="/favicon.png?v=2"
                 alt="ALYORA"
                 width={64}
                 height={64}
@@ -633,7 +633,7 @@ export default function SharedPropertyPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
             <Image
-              src="/favicon.png"
+              src="/favicon.png?v=2"
               alt="ALYORA"
               width={38}
               height={38}
